@@ -67,7 +67,7 @@ module.exports = {
               "KEYPRESS",
               "MODULE_DOM_CREATED",
               "KEYPRESS_MODE_CHANGED",
-              "USER_PRESENCE",
+              "USER_PRESENCE"
             ].indexOf(n) === -1
           ) {
             availabeActions.push(n);
@@ -97,7 +97,7 @@ module.exports = {
             modActions.forEach((a) => {
               actionsGuess[a.replace(/[-_]/g, "").toLowerCase()] = {
                 notification: a,
-                guessed: true,
+                guessed: true
               };
             });
 
@@ -114,7 +114,7 @@ module.exports = {
                   .replace(/MMM-/g, "")
                   .replace(/-/g, "")
                   .toLowerCase(),
-                actions: actionsGuess,
+                actions: actionsGuess
               };
             }
           }
@@ -168,19 +168,19 @@ module.exports = {
             if (query.apiKey !== this.apiKey) {
               return res.status(401).json({
                 success: false,
-                message: "Unauthorized: Wrong API Key Provided!",
+                message: "Unauthorized: Wrong API Key Provided!"
               });
             }
           } else {
             return res.status(403).json({
               success: false,
-              message: "Forbidden: API Key Not Provided!",
+              message: "Forbidden: API Key Not Provided!"
             });
           }
         } else if (req.headers.authorization.split(" ")[1] !== this.apiKey) {
           return res.status(401).json({
             success: false,
-            message: "Unauthorized: Wrong API Key Provided!",
+            message: "Unauthorized: Wrong API Key Provided!"
           });
         }
       }
@@ -189,7 +189,7 @@ module.exports = {
       if (req.method === "POST" && !req.is("application/json")) {
         res.status(400).json({
           success: false,
-          message: "Incorrect content-type, must be 'application/json'",
+          message: "Incorrect content-type, must be 'application/json'"
         });
         return;
       }
@@ -206,7 +206,7 @@ module.exports = {
         "/brightness",
         "/translations",
         "/mmUpdateAvailable",
-        "/config",
+        "/config"
       ])
       .get((req, res) => {
         let r = req.path.substring(1);
@@ -227,14 +227,14 @@ module.exports = {
         "/save",
         "/minimize",
         "/togglefullscreen",
-        "/devtools",
+        "/devtools"
       ])
       .get((req, res) => {
         if (!this.apiKey && this.secureEndpoints)
           return res.status(403).json({
             success: false,
             message:
-              "Forbidden: API Key Not Provided in Config! Use secureEndpoints to bypass this message",
+              "Forbidden: API Key Not Provided in Config! Use secureEndpoints to bypass this message"
           });
         let r = req.path.split("/")[1].toUpperCase();
         console.log(req.path);
@@ -254,7 +254,7 @@ module.exports = {
       } else {
         res.status(400).json({
           success: false,
-          message: `Invalid value ${val} provided in request. Use /api/classes to see actual values`,
+          message: `Invalid value ${val} provided in request. Use /api/classes to see actual values`
         });
       }
     });
@@ -264,7 +264,7 @@ module.exports = {
         return res.status(403).json({
           success: false,
           message:
-            "Forbidden: API Key Not Provided in Config! Use secureEndpoints to bypass this message",
+            "Forbidden: API Key Not Provided in Config! Use secureEndpoints to bypass this message"
         });
       const val = decodeURIComponent(req.params.value);
       self.executeQuery({ action: "COMMAND", command: req.params.value }, res);
@@ -280,7 +280,7 @@ module.exports = {
         } else {
           res.status(400).json({
             success: false,
-            message: `Invalid value ${req.params.value} provided in request. Must be true or false.`,
+            message: `Invalid value ${req.params.value} provided in request. Must be true or false.`
           });
         }
       } else {
@@ -293,7 +293,7 @@ module.exports = {
         return res.status(403).json({
           success: false,
           message:
-            "Forbidden: API Key Not Provided in Config! Use secureEndpoints to bypass this message",
+            "Forbidden: API Key Not Provided in Config! Use secureEndpoints to bypass this message"
         });
       if (!req.params.moduleName)
         return self.answerGet({ data: "mmUpdateAvailable" }, res);
@@ -313,6 +313,21 @@ module.exports = {
     });
 
     this.expressRouter
+      .route("/updateAvailable/:moduleName?")
+      .get((req, res) => {
+        if (!this.apiKey && this.secureEndpoints)
+          return res.status(403).json({
+            success: false,
+            message:
+              "Forbidden: API Key Not Provided in Config! Use secureEndpoints to bypass this message"
+          });
+        self.answerGet(
+          { data: "updateAvailable", module: req.params.moduleName },
+          res
+        );
+      });
+
+    this.expressRouter
       .route("/install")
       .get((req, res) => {
         res
@@ -324,14 +339,14 @@ module.exports = {
           return res.status(403).json({
             success: false,
             message:
-              "Forbidden: API Key Not Provided in Config! Use secureEndpoints to bypass this message",
+              "Forbidden: API Key Not Provided in Config! Use secureEndpoints to bypass this message"
           });
         if (typeof req.body !== "undefined" && "url" in req.body) {
           this.installModule(req.body.url, res);
         } else {
           res.status(400).json({
             success: false,
-            message: "Invalid URL provided in request body",
+            message: "Invalid URL provided in request body"
           });
         }
       });
@@ -349,14 +364,14 @@ module.exports = {
           return res.status(403).json({
             success: false,
             message:
-              "Forbidden: API Key Not Provided in Config! Use secureEndpoints to bypass this message",
+              "Forbidden: API Key Not Provided in Config! Use secureEndpoints to bypass this message"
           });
         if (typeof req.body !== "undefined" && "payload" in req.body) {
           this.answerPost({ data: "config" }, { body: req.body.payload }, res);
         } else {
           res.status(400).json({
             success: false,
-            message: "Invalid URL provided in request body",
+            message: "Invalid URL provided in request body"
           });
         }
       });
@@ -369,7 +384,7 @@ module.exports = {
           return res.status(403).json({
             success: false,
             message:
-              "Forbidden: API Key Not Provided in Config! Use secureEndpoints to bypass this message",
+              "Forbidden: API Key Not Provided in Config! Use secureEndpoints to bypass this message"
           });
         this.answerNotifyApi(req, res);
       })
@@ -378,7 +393,7 @@ module.exports = {
           return res.status(403).json({
             success: false,
             message:
-              "Forbidden: API Key Not Provided in Config! Use secureEndpoints to bypass this message",
+              "Forbidden: API Key Not Provided in Config! Use secureEndpoints to bypass this message"
           });
         this.answerNotifyApi(req, res);
       });
@@ -462,7 +477,7 @@ module.exports = {
             : req.query.abort && req.query.abort === "true"
             ? true
             : false,
-        query: query,
+        query: query
       };
       return dQuery;
     }
@@ -515,7 +530,7 @@ module.exports = {
     if (!modData.length) {
       res.status(400).json({
         success: false,
-        message: "Module Name or Identifier Not Found!",
+        message: "Module Name or Identifier Not Found!"
       });
       return;
     }
@@ -523,7 +538,7 @@ module.exports = {
     if (!req.params.action) {
       res.json({
         success: true,
-        data: dataMerged.filter((m) => req.params.moduleName.includes(m.name)),
+        data: dataMerged.filter((m) => req.params.moduleName.includes(m.name))
       });
       return;
     }
@@ -572,7 +587,7 @@ module.exports = {
       if ("method" in action && action.method !== req.method) {
         res.status(400).json({
           success: false,
-          info: `Method ${req.method} is not allowed for ${moduleName}/${req.params.action}.`,
+          info: `Method ${req.method} is not allowed for ${moduleName}/${req.params.action}.`
         });
         return;
       }
@@ -668,7 +683,7 @@ module.exports = {
       type: "menu",
       text: this.translate("%%TRANSLATE:MODULE_CONTROLS%%"),
       icon: "window-restore",
-      items: [],
+      items: []
     };
     Object.keys(this.externalApiRoutes).forEach((r) => {
       let sub = {
@@ -676,7 +691,7 @@ module.exports = {
         type: "menu",
         icon: "bars",
         text: this.formatName(this.externalApiRoutes[r].module),
-        items: [],
+        items: []
       };
       Object.keys(this.externalApiRoutes[r].actions).forEach((a) => {
         let item = {
@@ -684,7 +699,7 @@ module.exports = {
           menu: "item",
           icon: "dot-circle-o",
           action: "NOTIFICATION",
-          content: this.externalApiRoutes[r].actions[a],
+          content: this.externalApiRoutes[r].actions[a]
         };
         if ("prettyName" in this.externalApiRoutes[r].actions[a]) {
           item.text = this.translate(
@@ -709,5 +724,5 @@ module.exports = {
       "REMOTE_CLIENT_MODULEAPI_MENU",
       this.moduleApiMenu
     );
-  },
+  }
 };
