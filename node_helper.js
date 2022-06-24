@@ -32,7 +32,7 @@ Module = {
       "notificationReceived" in moduleDefinition
         ? moduleDefinition.notificationReceived.toString()
         : "";
-  },
+  }
 };
 
 module.exports = NodeHelper.create(
@@ -193,7 +193,7 @@ module.exports = NodeHelper.create(
           res.send({
             status: "error",
             reason: "unknown_command",
-            info: "original input: " + JSON.stringify(query),
+            info: "original input: " + JSON.stringify(query)
           });
         });
       },
@@ -222,7 +222,7 @@ module.exports = NodeHelper.create(
               console.error(result);
             }
             this.readModuleData();
-          },
+          }
         });
       },
 
@@ -248,7 +248,7 @@ module.exports = NodeHelper.create(
               author: "MichMich",
               desc: "",
               id: "MichMich/MagicMirror",
-              url: "https://github.com/MichMich/MagicMirror/wiki/MagicMirror%C2%B2-Modules#default-modules",
+              url: "https://github.com/MichMich/MagicMirror/wiki/MagicMirror%C2%B2-Modules#default-modules"
             });
             var module =
               self.modulesAvailable[self.modulesAvailable.length - 1];
@@ -298,7 +298,7 @@ module.exports = NodeHelper.create(
                 author: "unknown",
                 desc: "",
                 id: "local/" + folderName,
-                url: "",
+                url: ""
               };
               self.modulesAvailable.push(newModule);
               currentModule = newModule;
@@ -386,7 +386,7 @@ module.exports = NodeHelper.create(
                 "https://github.com/MichMich/MagicMirror/tree/" +
                 result.trim() +
                 "/modules/default/" +
-                query.module,
+                query.module
             });
             res.end();
           });
@@ -410,7 +410,7 @@ module.exports = NodeHelper.create(
               console.log(error);
             }
             res.writeHead(302, {
-              Location: baseUrl + "/tree/" + result.trim(),
+              Location: baseUrl + "/tree/" + result.trim()
             });
             res.end();
           });
@@ -541,7 +541,7 @@ module.exports = NodeHelper.create(
                   showHidden: false,
                   depth: null,
                   maxArrayLength: null,
-                  compact: false,
+                  compact: false
                 }) +
                 footer,
               (error) => {
@@ -550,7 +550,7 @@ module.exports = NodeHelper.create(
                   self.sendResponse(res, error, {
                     query: query,
                     backup: backupPath,
-                    data: self.configOnHd,
+                    data: self.configOnHd
                   });
                 }
                 console.info("MMM-Remote-Control saved new config!");
@@ -558,7 +558,7 @@ module.exports = NodeHelper.create(
                 self.sendResponse(res, undefined, {
                   query: query,
                   backup: backupPath,
-                  data: self.configOnHd,
+                  data: self.configOnHd
                 });
               }
             );
@@ -575,7 +575,7 @@ module.exports = NodeHelper.create(
           });
           this.sendResponse(res, undefined, {
             query: query,
-            data: this.modulesAvailable,
+            data: this.modulesAvailable
           });
           return;
         }
@@ -593,7 +593,7 @@ module.exports = NodeHelper.create(
         if (query.data === "translations") {
           this.sendResponse(res, undefined, {
             query: query,
-            data: this.translation,
+            data: this.translation
           });
           return;
         }
@@ -604,7 +604,7 @@ module.exports = NodeHelper.create(
               if (data.behind > 0) {
                 this.sendResponse(res, undefined, {
                   query: query,
-                  result: true,
+                  result: true
                 });
                 return;
               }
@@ -613,10 +613,71 @@ module.exports = NodeHelper.create(
           });
           return;
         }
+        if (query.data === "updateAvailable") {
+          var filterInstalled = function (value) {
+            return value.installed && !value.isDefaultModule;
+          };
+          var installed = self.modulesAvailable.filter(filterInstalled);
+
+          if (!query.module) {
+            let results = [];
+
+            Promise.all(
+              installed.map((t) => {
+                return simpleGit(
+                  path.resolve(
+                    path.resolve(__dirname + "/..") + "/" + t.longname
+                  )
+                )
+                  .fetch()
+                  .status((err, data) => {
+                    results.push({
+                      query,
+                      module: t,
+                      error: err,
+                      data
+                    });
+                  });
+              })
+            ).then((t) => {
+              this.sendResponse(res, undefined, {
+                query: query,
+                result: results
+              });
+            });
+          } else {
+            const requestedModule = installed.find(
+              (t) => t.longname === query.module
+            );
+
+            if (!requestedModule) {
+              this.sendResponse(res, undefined, {
+                query,
+                result: "module not found"
+              });
+              return;
+            }
+
+            const sg = simpleGit(
+              path.resolve(path.resolve(__dirname + "/..") + "/" + query.module)
+            )
+              .fetch()
+              .status((err, data) => {
+                if (!err) {
+                  this.sendResponse(res, undefined, {
+                    query,
+                    result: data.behind > 0
+                  });
+                }
+              });
+          }
+
+          return;
+        }
         if (query.data === "config") {
           this.sendResponse(res, undefined, {
             query: query,
-            data: this.getConfig(),
+            data: this.getConfig()
           });
           return;
         }
@@ -627,7 +688,7 @@ module.exports = NodeHelper.create(
             ).config || {};
           this.sendResponse(res, undefined, {
             query: query,
-            data: thisconfig.classes ? thisconfig.classes : {},
+            data: thisconfig.classes ? thisconfig.classes : {}
           });
           return;
         }
@@ -646,7 +707,7 @@ module.exports = NodeHelper.create(
           }
           this.sendResponse(res, undefined, {
             query: query,
-            data: times.sort((a, b) => b - a),
+            data: times.sort((a, b) => b - a)
           });
           return;
         }
@@ -656,7 +717,7 @@ module.exports = NodeHelper.create(
           } else {
             this.sendResponse(res, undefined, {
               query: query,
-              data: Module.configDefaults[query.module],
+              data: Module.configDefaults[query.module]
             });
           }
           return;
@@ -668,7 +729,7 @@ module.exports = NodeHelper.create(
           this.callAfterUpdate(() => {
             this.sendResponse(res, undefined, {
               query: query,
-              data: self.configData.moduleData,
+              data: self.configData.moduleData
             });
           });
           return;
@@ -680,7 +741,7 @@ module.exports = NodeHelper.create(
           this.callAfterUpdate(() => {
             this.sendResponse(res, undefined, {
               query: query,
-              result: self.configData.brightness,
+              result: self.configData.brightness
             });
           });
           return;
@@ -688,7 +749,7 @@ module.exports = NodeHelper.create(
         if (query.data === "userPresence") {
           this.sendResponse(res, undefined, {
             query: query,
-            result: this.userPresence,
+            result: this.userPresence
           });
           return;
         }
@@ -710,7 +771,7 @@ module.exports = NodeHelper.create(
             this.finished = true;
             this.callback();
           },
-          callback: callback,
+          callback: callback
         };
 
         this.waiting.push(waitObject);
@@ -744,7 +805,7 @@ module.exports = NodeHelper.create(
             success: false,
             status: "error",
             reason: "unknown",
-            info: error,
+            info: error
           };
           status = 400;
           result = false;
@@ -785,7 +846,7 @@ module.exports = NodeHelper.create(
             exec(monitorStatusCommand, opts, (error, stdout, stderr) => {
               status = offArr.indexOf(stdout.trim()) !== -1 ? "off" : "on";
               this.checkForExecError(error, stdout, stderr, res, {
-                monitor: status,
+                monitor: status
               });
               return;
             });
@@ -801,7 +862,7 @@ module.exports = NodeHelper.create(
           case "MONITORON":
             exec(monitorOnCommand, opts, (error, stdout, stderr) => {
               this.checkForExecError(error, stdout, stderr, res, {
-                monitor: "on",
+                monitor: "on"
               });
             });
             this.sendSocketNotification("USER_PRESENCE", true);
@@ -809,7 +870,7 @@ module.exports = NodeHelper.create(
           case "MONITOROFF":
             exec(monitorOffCommand, opts, (error, stdout, stderr) => {
               this.checkForExecError(error, stdout, stderr, res, {
-                monitor: "off",
+                monitor: "off"
               });
             });
             this.sendSocketNotification("USER_PRESENCE", false);
@@ -860,7 +921,7 @@ module.exports = NodeHelper.create(
               opts,
               (error, stdout, stderr) => {
                 self.checkForExecError(error, stdout, stderr, res, {
-                  stdout: stdout,
+                  stdout: stdout
                 });
               }
             );
@@ -936,7 +997,7 @@ module.exports = NodeHelper.create(
             type: type,
             title: title,
             message: message,
-            timer: timer * 1000,
+            timer: timer * 1000
           });
           return true;
         }
@@ -960,7 +1021,7 @@ module.exports = NodeHelper.create(
             }
             this.sendSocketNotification(query.action, {
               notification: query.notification,
-              payload: payload,
+              payload: payload
             });
             this.sendResponse(res);
             return true;
@@ -993,12 +1054,12 @@ module.exports = NodeHelper.create(
               if (["SHOW", "HIDE", "TOGGLE"].includes(act.toUpperCase())) {
                 if (typeof cl[act] == "string")
                   this.sendSocketNotification(act.toUpperCase(), {
-                    module: cl[act],
+                    module: cl[act]
                   });
                 else {
                   cl[act].forEach((t) => {
                     this.sendSocketNotification(act.toUpperCase(), {
-                      module: t,
+                      module: t
                     });
                   });
                 }
@@ -1116,7 +1177,7 @@ module.exports = NodeHelper.create(
             );
             if (modData === undefined) {
               this.sendResponse(res, new Error("Unknown Module"), {
-                info: modules,
+                info: modules
               });
               return;
             }
@@ -1145,7 +1206,7 @@ module.exports = NodeHelper.create(
                     console.log(error);
                     self.sendResponse(res, error, {
                       stdout: stdout,
-                      stderr: stderr,
+                      stderr: stderr
                     });
                   } else {
                     // success part
@@ -1159,12 +1220,12 @@ module.exports = NodeHelper.create(
                         self.sendResponse(res, undefined, {
                           code: "restart",
                           info: name + " updated.",
-                          chlog: chlog,
+                          chlog: chlog
                         });
                       } else {
                         self.sendResponse(res, undefined, {
                           code: "restart",
-                          info: name + " updated.",
+                          info: name + " updated."
                         });
                       }
                     });
@@ -1176,7 +1237,7 @@ module.exports = NodeHelper.create(
             } else {
               self.sendResponse(res, undefined, {
                 code: "up-to-date",
-                info: name + " already up to date.",
+                info: name + " already up to date."
               });
             }
           });
@@ -1193,7 +1254,7 @@ module.exports = NodeHelper.create(
           require("pm2");
         } catch (err) {
           this.sendResponse(res, err, {
-            reason: "PM2 not installed or unlinked",
+            reason: "PM2 not installed or unlinked"
           });
           return;
         }
@@ -1215,7 +1276,7 @@ module.exports = NodeHelper.create(
               pm2.restart(processName, (err, apps) => {
                 this.sendResponse(res, undefined, {
                   action: actionName,
-                  processName: processName,
+                  processName: processName
                 });
                 if (err) {
                   this.sendResponse(res, err);
@@ -1226,7 +1287,7 @@ module.exports = NodeHelper.create(
               pm2.stop(processName, (err, apps) => {
                 this.sendResponse(res, undefined, {
                   action: actionName,
-                  processName: processName,
+                  processName: processName
                 });
                 pm2.disconnect();
                 if (err) {
@@ -1260,7 +1321,7 @@ module.exports = NodeHelper.create(
         var text = JSON.stringify({
           moduleData: simpleModuleData,
           brightness: this.configData.brightness,
-          settingsVersion: this.configData.settingsVersion,
+          settingsVersion: this.configData.settingsVersion
         });
 
         fs.writeFile(
@@ -1461,7 +1522,7 @@ module.exports = NodeHelper.create(
             this.updateModuleApiMenu();
           }
         }
-      },
+      }
     },
     require("./API/api.js")
   )
