@@ -633,9 +633,9 @@ module.exports = NodeHelper.create(
                   .status((err, data) => {
                     results.push({
                       query,
-                      module: t,
+                      module: t.longname,
                       error: err,
-                      data
+                      result: data.behind > 0
                     });
                   });
               })
