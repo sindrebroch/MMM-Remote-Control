@@ -632,7 +632,6 @@ module.exports = NodeHelper.create(
                   .fetch()
                   .status((err, data) => {
                     results.push({
-                      query,
                       module: t.longname,
                       error: err,
                       result: data.behind > 0
