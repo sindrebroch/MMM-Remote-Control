@@ -1,5 +1,7 @@
 # Magic Mirror Module: Remote Control w/ RESTful API
 
+**This is a fork of [MMM-Remote-Control](https://github.com/Jopyth/MMM-Remote-Control)**
+
 This module for the [Magic Mirror²](https://github.com/MichMich/MagicMirror) allows you to quickly shutdown your mirror through a web browser.
 The website should work fine on any device (desktop, smart phone, tablet, ...).
 Since we all want our [SD cards to live a long and prosper life](http://raspberrypi.stackexchange.com/a/383) we properly shut down before pulling the power plug everytime, am I right?
