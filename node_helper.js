@@ -630,18 +630,32 @@ module.exports = NodeHelper.create(
                   )
                 )
                   .fetch()
+                  .getRemotes(true, (_, remotes) => {
+                    results[t.longname] = {
+                      ...results[t.longname],
+                      remote: remotes[0].refs.fetch
+                    };
+                  })
+                  .listRemote((_, lsremote) => {
+                    results[t.longname] = {
+                      ...results[t.longname],
+                      lsremote: lsremote.split("\n")[0]
+                    };
+                  })
                   .status((err, data) => {
-                    results.push({
+                    results[t.longname] = {
+                      ...results[t.longname],
                       module: t.longname,
                       error: err,
+                      behind: data.behind,
                       result: data.behind > 0
-                    });
+                    };
                   });
               })
-            ).then((t) => {
+            ).then((_) => {
               this.sendResponse(res, undefined, {
                 query: query,
-                result: results
+                result: Object.values(results)
               });
             });
           } else {
@@ -657,17 +671,36 @@ module.exports = NodeHelper.create(
               return;
             }
 
-            const sg = simpleGit(
+            let result = {};
+
+            simpleGit(
               path.resolve(path.resolve(__dirname + "/..") + "/" + query.module)
             )
               .fetch()
+              .getRemotes(true, (_, remotes) => {
+                result = {
+                  ...result,
+                  remote: remotes[0].refs.fetch
+                };
+              })
+              .listRemote((_, lsremote) => {
+                result = {
+                  ...result,
+                  lsremote: lsremote.split("\n")[0]
+                };
+              })
               .status((err, data) => {
-                if (!err) {
-                  this.sendResponse(res, undefined, {
-                    query,
-                    result: data.behind > 0
-                  });
-                }
+                result = {
+                  ...result,
+                  module: requestedModule.longname,
+                  error: err,
+                  behind: data.behind,
+                  result: data.behind > 0
+                };
+                this.sendResponse(res, undefined, {
+                  query,
+                  ...result
+                });
               });
           }
 
