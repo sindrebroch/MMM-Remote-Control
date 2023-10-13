@@ -23,6 +23,7 @@
   "dependencies": {
     "body-parser": "latest",
     "simple-git": "latest",
+    "node-fetch": "^2.7.0",
     "lodash": "latest",
     "uuid": "^3.3.2"
   }
